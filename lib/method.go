@@ -47,6 +47,9 @@ func (G *Grey) CheckKey_() {
 	case "DES":
 		G.EncryptKey = G.EncryptKey[:8]
 		break
+	case "RSA":
+		G.EncryptKey = G.EncryptKey
+		break
 	}
 }
 
@@ -150,6 +153,37 @@ func (G *Grey) connect_(client net.Conn) {
 			go io.Copy(client, connect)
 		}
 		break
+
+	case "RSA":
+		if G.TurnMethod != "null" {
+			go func(key []byte, turn string) {
+				buf := make([]byte, MessageBlock)
+
+				for {
+					size, err := client.Read(buf)
+					if err == nil {
+						result := RSACrypto(buf[:size], key, turn)
+						connect.Write(result)
+					}
+				}
+			}(G.EncryptKey, G.TurnMethod)
+		} else {
+			go io.Copy(connect, client)
+		}
+		if G.AcceptMethod != "null" {
+			go func(key []byte, turn string) {
+				buf := make([]byte, MessageBlock)
+				for {
+					size, err := connect.Read(buf)
+					if err == nil {
+						result := RSACrypto(buf[:size], key, turn)
+						client.Write(result)
+					}
+				}
+			}(G.EncryptKey, G.AcceptMethod)
+		} else {
+			go io.Copy(client, connect)
+		}
 	}
 
 }

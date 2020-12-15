@@ -83,6 +83,28 @@ func DESCrypto(buf []byte, key []byte, method string, turn string) []byte {
 	return d.Result
 }
 
+func RSACrypto(buf []byte, key []byte, turn string) []byte {
+	r := encrypt.RSAData{
+		Source:  buf,
+		Content: key,
+	}
+	switch turn {
+	case "en":
+		_, err := r.Encrypt()
+		if err != nil {
+			log.Println(err)
+		}
+		break
+	case "de":
+		_, err := r.Decrypt()
+		if err != nil {
+			log.Println(err)
+		}
+		break
+	}
+	return r.Result
+}
+
 func NetURL(url string, method string) []byte {
 	switch strings.ToUpper(method) {
 	case "GET":

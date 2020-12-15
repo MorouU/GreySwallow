@@ -14,7 +14,7 @@ func main() {
 
 	var banner string = `
 =================================================
-	Grey swallow _V1.05 welcome!
+	Grey swallow _V1.06 welcome!
 =================================================
 `
 	var listenData string
